@@ -1,0 +1,78 @@
+﻿<Window x:Class="PACMAN.AddLocation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:telerik="http://schemas.telerik.com/2008/xaml/presentation"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PACMAN"
+        mc:Ignorable="d"
+        Title="Add Location Data" Height="400" Width="950" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Topmost="True">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="10px" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="10px" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="45" />
+            <RowDefinition Height="10" />
+        </Grid.RowDefinitions>
+        <!--<Label Grid.Column="1" Grid.Row="1" FontSize="12" HorizontalAlignment="Right" FontFamily="Segoe UI">Location Name:</Label>
+        <TextBox Grid.Column="2" Grid.Row="1" Margin="5,5,5,5" VerticalAlignment="Center"></TextBox>
+
+        <Label Grid.Column="1" Grid.Row="2" FontSize="12" HorizontalAlignment="Right" FontFamily="Segoe UI">Data File:</Label>
+        <StackPanel Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="1" Margin="5,5,5,5" VerticalAlignment="Center" >
+            <telerik:RadButton Content=". . ." Click="SelectFile_Click"/>
+        </StackPanel>-->
+
+        <telerik:RadGridView x:Name="newLocationGrid" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="3" ItemsSource="{Binding LocationData}" AutoGenerateColumns="False"
+                             SelectionMode="Single" SelectionUnit="Cell" IsFilteringAllowed="False" CanUserGroupColumns="False" ShowGroupPanel="False">
+
+            <telerik:RadGridView.Resources>
+                <Style x:Key="disabledStyle" TargetType="telerik:GridViewCell">
+                    <Setter Property="IsEnabled" Value="False"/>
+                </Style>
+            </telerik:RadGridView.Resources>
+            <telerik:RadGridView.Columns>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding MonthName}" Header="Month" IsReadOnly="True" CellStyle="{StaticResource disabledStyle}" />
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding Deposit}" Header="Deposit"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding Sea}" Header="Min Salts"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding AmmNit}" Header="NH4NO3"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding AmmSul}" Header="(NH4)2SO4"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding RainDep}" Header="pH"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding RainConc}" Header="Conc"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding NaCl}" Header="NaCl"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding MgCl2}" Header="MgCl2"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding Na2S04}" Header="Na2S04"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding CaC12}" Header="CaC12"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding KCI}" Header="KCI"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding MgSO4}" Header="MgSO4"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding K2SO4}" Header="K2SO4"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding CaSO4}" Header="CaSO4"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding total}" Header="Total"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding HSMass}" Header="HSSO4"/>
+                <telerik:GridViewDataColumn DataMemberBinding="{Binding HNMass}" Header="HNO3"/>
+            </telerik:RadGridView.Columns>
+        </telerik:RadGridView>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="4" Margin="5,0,0,0" Width="275">
+            <Label Height="25px" Width="95" Margin="5,0,0,0">Location Name: </Label>
+            <TextBox x:Name="newLocationName" Height="25px" Width="170"></TextBox>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="2" Grid.Row="4" Margin="5,0,0,0" Width="275">
+            <Label x:Name="ErrorLabel" Height="30px" Width="250" Visibility="Hidden" Foreground="Red">Error Text</Label>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Grid.Column="3" Grid.Row="4" Margin="5,0,0,0" Width="200">
+            <telerik:RadButton  Content="Submit" Click="Submit_Click" Height="25px" Width="80" Margin="5,0,5,0"/>
+            <telerik:RadButton Content="Cancel" Click="Cancel_Click" Height="25px" Width="80" Margin="5,0,0,0"/>
+        </StackPanel>
+    </Grid>
+</Window>

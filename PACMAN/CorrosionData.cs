@@ -49,6 +49,10 @@ namespace PACMAN
         public List<CorrosionDataPoint> PitPoints { get; set; }
         public List<CorrosionDataPoint> SteelLossPoints { get; set; }
 
+        public List<CorrosionDataPoint> Corr1Values { get; set; }
+
+        public List<CorrosionDataPoint> Corr2Values { get; set; }
+
         public CorrosionData()
         {
             PitDiameter = new List<double>();
@@ -81,6 +85,7 @@ namespace PACMAN
                 {
                     CorrosionDataPoint cdp = new CorrosionDataPoint();
                     cdp.Value = e1.Current;
+                    cdp.Y = i + 1;
                     cdp.Date = e2.Current;
                     cdp.Name = "Temperature";
                     if (i < cutoffValues[cutOffIndex])
@@ -112,6 +117,7 @@ namespace PACMAN
                 {
                     CorrosionDataPoint cdp = new CorrosionDataPoint();
                     cdp.Value = e1.Current;
+                    cdp.Y = i + 1;
                     cdp.Date = e2.Current;
                     cdp.Name = "Relative Humidity";
                     if (i < cutoffValues[cutOffIndex])
@@ -145,6 +151,7 @@ namespace PACMAN
                 {
                     CorrosionDataPoint cdp = new CorrosionDataPoint();
                     cdp.Value = e1.Current;
+                    cdp.Y = i + 1;
                     cdp.Date = e2.Current;
                     cdp.Name = "Precipitation";
                     if (i < cutoffValues[cutOffIndex])
@@ -177,6 +184,7 @@ namespace PACMAN
                 {
                     CorrosionDataPoint cdp = new CorrosionDataPoint();
                     cdp.Value = e1.Current;
+                    cdp.Y = i + 1;
                     cdp.Date = e2.Current;
                     cdp.Name = "Time of Wetness";
                     if (i < cutoffValues[cutOffIndex])
@@ -208,6 +216,7 @@ namespace PACMAN
                 {
                     CorrosionDataPoint cdp = new CorrosionDataPoint();
                     cdp.Value = e1.Current;
+                    cdp.Y = i + 1;
                     cdp.Date = e2.Current;
                     cdp.Name = "Surface Pollutants";
                     if (i < cutoffValues[cutOffIndex])
@@ -227,11 +236,22 @@ namespace PACMAN
             return cdpList;
         }
 
-        public List<CorrosionDataPoint> getDropletsPoints()
+        public List<CorrosionDataPoint> getDropletsPoints(bool addZeroPoint)
         {
             List<CorrosionDataPoint> cdpList = new List<CorrosionDataPoint>();
+
             int i = 0;
             int dropletIndex = 0;
+
+            if (addZeroPoint)
+            {
+                CorrosionDataPoint cdpZeroPoint = new CorrosionDataPoint();
+                cdpZeroPoint.Value = 0;
+                cdpZeroPoint.Y = 0;
+                cdpZeroPoint.Name = "Droplets";
+                cdpList.Add(cdpZeroPoint);
+            }
+
             using (var e1 = Droplets.GetEnumerator())
             using (var e2 = DropletsY.GetEnumerator())
             {

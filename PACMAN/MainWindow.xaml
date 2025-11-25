@@ -26,7 +26,13 @@
             <telerik:RadMenuItem Header="Home" Click="RibbonHomeClick">
             </telerik:RadMenuItem>
             <telerik:RadMenuItem Header="Analysis Type">
+                <telerik:RadMenuItem Header="Timespan Analysis" Click="RibbonTimespanClick"/>
                 <telerik:RadMenuItem Header="Single File Analysis" Click="RibbonSingleClick"/>
+                <!--<telerik:RadMenuItem Header="Long Term Analysis" Click="RibbonLongTermClick"/>-->
+            </telerik:RadMenuItem>
+            <telerik:RadMenuItem Header="Database Options">
+                <telerik:RadMenuItem Header="Manual Data Download" Click="RibbonManualDownloadClick"/>
+                <telerik:RadMenuItem Header="Add Location Data" Click="RibbonAddLocationClick"/>
                 <!--<telerik:RadMenuItem Header="Long Term Analysis" Click="RibbonLongTermClick"/>-->
             </telerik:RadMenuItem>
             <telerik:RadMenuItem Header="Close" Click="RibbonCloseClick">
@@ -96,7 +102,12 @@
                                     <telerik:CartesianChartGrid MajorLinesVisibility="Y" StripLinesVisibility="Y" />
                                 </telerik:RadCartesianChart.Grid>
                             </telerik:RadCartesianChart>
-                                <telerik:RadButton Content="Download Droplets Points" Click="downloadDroplets_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px"/>
+                                <telerik:RadButton Click="downloadDroplets_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                        <Label VerticalAlignment="Center">Save Droplets Points</Label>
+                                    </StackPanel>
+                                </telerik:RadButton>
                             </DockPanel>
                         </telerik:RadPane>
                         <telerik:RadPane x:Name="RelativeHumidityPane" Header="Relative Humidity" Visibility="Hidden">
@@ -124,7 +135,12 @@
                                     <telerik:CartesianChartGrid MajorLinesVisibility="Y" StripLinesVisibility="Y" />
                                 </telerik:RadCartesianChart.Grid>
                             </telerik:RadCartesianChart>
-                                <telerik:RadButton Content="Download Relative Humidity Points" Click="downloadRelativeHumidity_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px"/>
+                                <telerik:RadButton Click="downloadRelativeHumidity_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                        <Label VerticalAlignment="Center">Save Relative Humidity Points</Label>
+                                    </StackPanel>
+                                </telerik:RadButton>
                             </DockPanel>
                         </telerik:RadPane>
                         <telerik:RadPane x:Name="TemperaturePane" Header="Temperature (C)" Visibility="Hidden">
@@ -152,7 +168,12 @@
                                     <telerik:CartesianChartGrid MajorLinesVisibility="Y" StripLinesVisibility="Y" />
                                 </telerik:RadCartesianChart.Grid>
                             </telerik:RadCartesianChart>
-                                <telerik:RadButton Content="Download Temperature Points" Click="downloadTemperature_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px"/>
+                                <telerik:RadButton Click="downloadTemperature_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                        <Label VerticalAlignment="Center">Save Temperature Points</Label>
+                                    </StackPanel>
+                                </telerik:RadButton>
                             </DockPanel>
                         </telerik:RadPane>
                         <telerik:RadPane x:Name="PrecipitationPane" Header="Precipitation" Visibility="Hidden">
@@ -180,7 +201,12 @@
                                     <telerik:CartesianChartGrid MajorLinesVisibility="Y" StripLinesVisibility="Y" />
                                 </telerik:RadCartesianChart.Grid>
                             </telerik:RadCartesianChart>
-                                <telerik:RadButton Content="Download Precipitation Points" Click="downloadPrecipitation_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px"/>
+                                <telerik:RadButton Click="downloadPrecipitation_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                        <Label VerticalAlignment="Center">Save Precipitation Points</Label>
+                                    </StackPanel>
+                                </telerik:RadButton>
                             </DockPanel>
                         </telerik:RadPane>
                         <telerik:RadPane x:Name="SurfacePollutantsPane" Header="Surface Pollutants" Visibility="Hidden">
@@ -208,7 +234,12 @@
                                     <telerik:CartesianChartGrid MajorLinesVisibility="Y" StripLinesVisibility="Y" />
                                 </telerik:RadCartesianChart.Grid>
                             </telerik:RadCartesianChart>
-                                <telerik:RadButton Content="Download Surface Pollutants Points" Click="downloadSurfacePollutants_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px"/>
+                                <telerik:RadButton Click="downloadSurfacePollutants_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                        <Label VerticalAlignment="Center">Save Surface Pollutants Points</Label>
+                                    </StackPanel>
+                                </telerik:RadButton>
                             </DockPanel>
                         </telerik:RadPane>
                         <telerik:RadPane x:Name="TimeOfWetnessPane" Header="Time of Wetness" Visibility="Hidden">
@@ -236,7 +267,12 @@
                                     <telerik:CartesianChartGrid MajorLinesVisibility="Y" StripLinesVisibility="Y" />
                                 </telerik:RadCartesianChart.Grid>
                             </telerik:RadCartesianChart>
-                                <telerik:RadButton Content="Download Time Of Wetness Points" Click="downloadTimeOfWetness_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px"/>
+                                <telerik:RadButton Click="downloadTimeOfWetness_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                        <Label VerticalAlignment="Center">Save Time Of Wetness Points</Label>
+                                    </StackPanel>
+                                </telerik:RadButton>
                             </DockPanel>
                         </telerik:RadPane>
                         <telerik:RadPane x:Name="PitDistributionPane" Header="Pit Distribution" Visibility="Hidden">
@@ -255,12 +291,27 @@
                                 </telerik:RadCartesianChart.VerticalAxis>
 
                             </telerik:RadCartesianChart>
-                                <telerik:RadButton Content="Download Pit Points" Click="downloadPit_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px"/>
+                                <telerik:RadButton Click="downloadPit_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                        <Label VerticalAlignment="Center">Save Pit Points</Label>
+                                    </StackPanel>
+                                </telerik:RadButton>
                             </DockPanel>
                         </telerik:RadPane>
                         <telerik:RadPane x:Name="SteelWeightLossPane" Header="Steel Weight Loss" Visibility="Hidden">
                             <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto">
-                                <telerik:RadCartesianChart x:Name="SteelWeightLossChart" Grid.Row="1" Palette="Windows8" DockPanel.Dock="Top" Height="600px">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="100px" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="200px"/>
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadCartesianChart x:Name="SteelWeightLossChart" Grid.Row="1" Grid.RowSpan="2" Palette="Windows8" DockPanel.Dock="Top" Height="600px">
                                 <telerik:RadCartesianChart.Resources>
                                     <DataTemplate x:Key="PointTemplate1">
                                         <Ellipse Height="8" Width="8" Fill="#FF8EC441" />
@@ -283,9 +334,74 @@
                                 </telerik:RadCartesianChart.VerticalAxis>
 
                             </telerik:RadCartesianChart>
-                                <telerik:RadButton Content="Download Steel Weight Loss Points" Click="downloadSteelWeightLoss_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Width="300px"/>
+                                <telerik:RadLegend x:Name="SteelWeightLossLegend"
+                                                   Items="{Binding LegendItems, ElementName=SteelWeightLossChart}"
+                           BorderBrush="Black"  
+                           BorderThickness="1" 
+                                                   Grid.Column="1"
+                                                   Grid.Row="1"/>
+                                    <telerik:RadButton Click="downloadSteelWeightLoss_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                            <Label VerticalAlignment="Center">Save Steel Weight Loss Points</Label>
+                                        </StackPanel>
+                                    </telerik:RadButton>
+                                </Grid>
                             </DockPanel>
                         </telerik:RadPane>
+
+                        <telerik:RadPane x:Name="SteelCorrPane" Header="Steel Corrosion" Visibility="Hidden">
+                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Height="Auto">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="100px" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="200px"/>
+                                    </Grid.ColumnDefinitions>
+                                    <telerik:RadCartesianChart x:Name="SteelCorrChart" Grid.Row="1" Grid.RowSpan="2" Palette="Windows8" DockPanel.Dock="Top" Height="600px">
+                                        <telerik:RadCartesianChart.Resources>
+                                            <DataTemplate x:Key="PointTemplate1">
+                                                <Ellipse Height="8" Width="8" Fill="#FF8EC441" />
+                                            </DataTemplate>
+                                            <DataTemplate x:Key="PointTemplate2">
+                                                <Rectangle Height="8" Width="8" Fill="#FF1B9DDE" />
+                                            </DataTemplate>
+                                        </telerik:RadCartesianChart.Resources>
+
+                                        <telerik:RadCartesianChart.HorizontalAxis>
+                                            <telerik:LinearAxis Title="Days">
+
+                                            </telerik:LinearAxis>
+                                        </telerik:RadCartesianChart.HorizontalAxis>
+
+                                        <telerik:RadCartesianChart.VerticalAxis>
+                                            <telerik:LinearAxis Title="\u03BCm">
+
+                                            </telerik:LinearAxis>
+                                        </telerik:RadCartesianChart.VerticalAxis>
+
+                                    </telerik:RadCartesianChart>
+                                    <telerik:RadLegend x:Name="SteelCorrLegend"
+                                                   Items="{Binding LegendItems, ElementName=SteelCorrChart}"
+                           BorderBrush="Black"  
+                           BorderThickness="1" 
+                                                   Grid.Column="1"
+                                                   Grid.Row="1"/>
+                                    <telerik:RadButton Click="downloadSteelCorr_Click" DockPanel.Dock="Bottom" Height="50px" Margin="5,5,5,5" HorizontalAlignment="Right" Grid.Column="1" Grid.Row="2">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="/PACMAN;component/Images/Save16.png" Width="20px" Height="20px"/>
+                                            <Label VerticalAlignment="Center">Save Steel Corr Points</Label>
+                                        </StackPanel>
+                                    </telerik:RadButton>
+                                </Grid>
+                            </DockPanel>
+                        </telerik:RadPane>
+
+
                         <telerik:RadPane x:Name="FleetAnalysisPane" Header="Fleet Analysis" Visibility="Hidden">
                             <telerik:RadPane.Content>
                                 <telerik:RadGridView x:Name="FleetGridView" AutoGenerateColumns="False" ShowGroupPanel="False" ColumnWidth="*">

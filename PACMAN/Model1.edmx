@@ -48,6 +48,16 @@
           <Property Name="pH" Type="float" />
           <Property Name="Conc" Type="float" />
         </EntityType>
+        <EntityType Name="t_ErrorList">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MESSAGEUID" Type="varchar" MaxLength="50" />
+          <Property Name="ERRORMESSAGE" Type="varchar" MaxLength="50" />
+          <Property Name="ERRORDATE" Type="datetime" Nullable="false" />
+          <Property Name="EMAILTITLE" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
         <EntityType Name="t_Flights">
           <Key>
             <PropertyRef Name="Aircraft_Tail" />
@@ -164,27 +174,17 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
           </Key>
           <Property Name="Location" Type="int" Nullable="false" />
           <Property Name="Timestamp" Type="datetime2" Precision="7" Nullable="false" />
-          <Property Name="TZ" Type="varchar" MaxLength="10" Nullable="false" />
-          <Property Name="PWR_OUT_V_1" Type="int" Nullable="false" />
-          <Property Name="Delay_4_Vaisala_ms" Type="int" Nullable="false" />
-          <Property Name="Resistance_C1_S1_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C1_S2_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C1_S3_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C1_S4_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C1_S5_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C2_S1_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C2_S2_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C2_S3_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C2_S4_Ohms" Type="float" Nullable="false" />
-          <Property Name="Resistance_C2_S5_Ohms" Type="float" Nullable="false" />
-          <Property Name="LM335_T1_degC" Type="float" Nullable="false" />
-          <Property Name="LM335_T2_degC" Type="float" Nullable="false" />
-          <Property Name="TOW_Current_1_amp" Type="float" Nullable="false" />
-          <Property Name="TOW_Current_2_amp" Type="float" Nullable="false" />
-          <Property Name="Vaisala_Temp_degC" Type="float" Nullable="false" />
-          <Property Name="Vaisala_RH__PR" Type="float" Nullable="false" />
-          <Property Name="PWR_OUT_V_2" Type="int" Nullable="false" />
-          <Property Name="Internal_6_V" Type="float" Nullable="false" />
+          <Property Name="SHTTemp" Type="float" Nullable="false" />
+          <Property Name="SHTRH" Type="float" Nullable="false" />
+          <Property Name="Corr1" Type="float" Nullable="false" />
+          <Property Name="Corr2" Type="float" Nullable="false" />
+          <Property Name="TOW" Type="float" Nullable="false" />
+          <Property Name="TC1" Type="float" Nullable="false" />
+          <Property Name="TC2" Type="float" Nullable="false" />
+          <Property Name="TC2Cold" Type="float" Nullable="false" />
+          <Property Name="ResistanceReference" Type="float" Nullable="false" />
+          <Property Name="Battery" Type="float" Nullable="false" />
+          <Property Name="Rain" Type="bit" Nullable="false" />
         </EntityType>
         <Association Name="FK__t_Flights__Desti__30C33EC3">
           <End Role="t_Location" Type="Self.t_Location" Multiplicity="1" />
@@ -266,6 +266,7 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
           <EntitySet Name="CombinedData" EntityType="Self.CombinedData" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MetData" EntityType="Self.MetData" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="t_Base_Properties" EntityType="Self.t_Base_Properties" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="t_ErrorList" EntityType="Self.t_ErrorList" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="t_Flights" EntityType="Self.t_Flights" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="t_History" EntityType="Self.t_History" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="t_Images" EntityType="Self.t_Images" Schema="dbo" store:Type="Tables" />
@@ -412,7 +413,7 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
           <NavigationProperty Name="t_Flights1" Relationship="Self.FK__t_Flights__From___2FCF1A8A" FromRole="t_Location" ToRole="t_Flights" />
           <NavigationProperty Name="t_History" Relationship="Self.FK__t_History__Locat__2B0A656D" FromRole="t_Location" ToRole="t_History" />
           <NavigationProperty Name="t_Pollutant_Deposition" Relationship="Self.FK__t_Polluta__Locat__4F47C5E3" FromRole="t_Location" ToRole="t_Pollutant_Deposition" />
-          <NavigationProperty Name="t_Sensor_Data" Relationship="Self.FK_t_Sensor_Data" FromRole="t_Location" ToRole="t_Sensor_Data" />
+          <NavigationProperty Name="t_Sensor_Data" Relationship="CorrosionModelModel.FK_t_Sensor_Data" FromRole="t_Location" ToRole="t_Sensor_Data" />
         </EntityType>
         <EntityType Name="t_Materials">
           <Key>
@@ -462,36 +463,6 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
           <Property Name="MinSalts" Type="Double" />
           <Property Name="HSMass" Type="Double" />
           <Property Name="HNMass" Type="Double" />
-        </EntityType>
-        <EntityType Name="t_Sensor_Data">
-          <Key>
-            <PropertyRef Name="Location" />
-            <PropertyRef Name="Timestamp" />
-          </Key>
-          <Property Name="Location" Type="Int32" Nullable="false" />
-          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="7" />
-          <Property Name="TZ" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="PWR_OUT_V_1" Type="Int32" Nullable="false" />
-          <Property Name="Delay_4_Vaisala_ms" Type="Int32" Nullable="false" />
-          <Property Name="Resistance_C1_S1_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C1_S2_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C1_S3_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C1_S4_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C1_S5_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C2_S1_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C2_S2_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C2_S3_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C2_S4_Ohms" Type="Double" Nullable="false" />
-          <Property Name="Resistance_C2_S5_Ohms" Type="Double" Nullable="false" />
-          <Property Name="LM335_T1_degC" Type="Double" Nullable="false" />
-          <Property Name="LM335_T2_degC" Type="Double" Nullable="false" />
-          <Property Name="TOW_Current_1_amp" Type="Double" Nullable="false" />
-          <Property Name="TOW_Current_2_amp" Type="Double" Nullable="false" />
-          <Property Name="Vaisala_Temp_degC" Type="Double" Nullable="false" />
-          <Property Name="Vaisala_RH__PR" Type="Double" Nullable="false" />
-          <Property Name="PWR_OUT_V_2" Type="Int32" Nullable="false" />
-          <Property Name="Internal_6_V" Type="Double" Nullable="false" />
-          <NavigationProperty Name="t_Location" Relationship="Self.FK_t_Sensor_Data" FromRole="t_Sensor_Data" ToRole="t_Location" />
         </EntityType>
         <EntityType Name="t_Pollutant_Deposition">
           <Key>
@@ -561,20 +532,6 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_t_Sensor_Data">
-          <End Role="t_Location" Type="Self.t_Location" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="t_Sensor_Data" Type="Self.t_Sensor_Data" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="t_Location">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="t_Sensor_Data">
-              <PropertyRef Name="Location" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_t_Parameter_List">
           <End Role="t_Parameters" Type="Self.t_Parameters" Multiplicity="1">
             <OnDelete Action="Cascade" />
@@ -601,7 +558,6 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
           <EntitySet Name="t_Parameter_List" EntityType="Self.t_Parameter_List" />
           <EntitySet Name="t_Parameters" EntityType="Self.t_Parameters" />
           <EntitySet Name="t_Salt_Composition" EntityType="Self.t_Salt_Composition" />
-          <EntitySet Name="t_Sensor_Data" EntityType="Self.t_Sensor_Data" />
           <EntitySet Name="t_Pollutant_Deposition" EntityType="Self.t_Pollutant_Deposition" />
           <AssociationSet Name="FK__t_Flights__Desti__30C33EC3" Association="Self.FK__t_Flights__Desti__30C33EC3">
             <End Role="t_Location" EntitySet="t_Location" />
@@ -619,15 +575,61 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
             <End Role="t_Location" EntitySet="t_Location" />
             <End Role="t_Pollutant_Deposition" EntitySet="t_Pollutant_Deposition" />
           </AssociationSet>
-          <AssociationSet Name="FK_t_Sensor_Data" Association="Self.FK_t_Sensor_Data">
-            <End Role="t_Location" EntitySet="t_Location" />
-            <End Role="t_Sensor_Data" EntitySet="t_Sensor_Data" />
-          </AssociationSet>
           <AssociationSet Name="FK_t_Parameter_List" Association="Self.FK_t_Parameter_List">
             <End Role="t_Parameters" EntitySet="t_Parameters" />
             <End Role="t_Parameter_List" EntitySet="t_Parameter_List" />
           </AssociationSet>
+          <EntitySet Name="t_ErrorList" EntityType="CorrosionModelModel.t_ErrorList" />
+          <EntitySet Name="t_Sensor_Data" EntityType="CorrosionModelModel.t_Sensor_Data" />
+          <AssociationSet Name="FK_t_Sensor_Data" Association="CorrosionModelModel.FK_t_Sensor_Data">
+            <End Role="t_Location" EntitySet="t_Location" />
+            <End Role="t_Sensor_Data" EntitySet="t_Sensor_Data" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="t_ErrorList">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MESSAGEUID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ERRORMESSAGE" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ERRORDATE" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EMAILTITLE" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="t_Sensor_Data">
+          <Key>
+            <PropertyRef Name="Location" />
+            <PropertyRef Name="Timestamp" />
+          </Key>
+          <Property Name="Location" Type="Int32" Nullable="false" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" Precision="7" />
+          <Property Name="SHTTemp" Type="Double" Nullable="false" />
+          <Property Name="SHTRH" Type="Double" Nullable="false" />
+          <Property Name="Corr1" Type="Double" Nullable="false" />
+          <Property Name="Corr2" Type="Double" Nullable="false" />
+          <Property Name="TOW" Type="Double" Nullable="false" />
+          <Property Name="TC1" Type="Double" Nullable="false" />
+          <Property Name="TC2" Type="Double" Nullable="false" />
+          <Property Name="TC2Cold" Type="Double" Nullable="false" />
+          <Property Name="ResistanceReference" Type="Double" Nullable="false" />
+          <Property Name="Battery" Type="Double" Nullable="false" />
+          <Property Name="Rain" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="t_Location" Relationship="CorrosionModelModel.FK_t_Sensor_Data" FromRole="t_Sensor_Data" ToRole="t_Location" />
+        </EntityType>
+        <Association Name="FK_t_Sensor_Data">
+          <End Type="CorrosionModelModel.t_Location" Role="t_Location" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="CorrosionModelModel.t_Sensor_Data" Role="t_Sensor_Data" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="t_Location">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="t_Sensor_Data">
+              <PropertyRef Name="Location" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -768,35 +770,6 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="t_Sensor_Data">
-            <EntityTypeMapping TypeName="CorrosionModelModel.t_Sensor_Data">
-              <MappingFragment StoreEntitySet="t_Sensor_Data">
-                <ScalarProperty Name="Location" ColumnName="Location" />
-                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
-                <ScalarProperty Name="TZ" ColumnName="TZ" />
-                <ScalarProperty Name="PWR_OUT_V_1" ColumnName="PWR_OUT_V_1" />
-                <ScalarProperty Name="Delay_4_Vaisala_ms" ColumnName="Delay_4_Vaisala_ms" />
-                <ScalarProperty Name="Resistance_C1_S1_Ohms" ColumnName="Resistance_C1_S1_Ohms" />
-                <ScalarProperty Name="Resistance_C1_S2_Ohms" ColumnName="Resistance_C1_S2_Ohms" />
-                <ScalarProperty Name="Resistance_C1_S3_Ohms" ColumnName="Resistance_C1_S3_Ohms" />
-                <ScalarProperty Name="Resistance_C1_S4_Ohms" ColumnName="Resistance_C1_S4_Ohms" />
-                <ScalarProperty Name="Resistance_C1_S5_Ohms" ColumnName="Resistance_C1_S5_Ohms" />
-                <ScalarProperty Name="Resistance_C2_S1_Ohms" ColumnName="Resistance_C2_S1_Ohms" />
-                <ScalarProperty Name="Resistance_C2_S2_Ohms" ColumnName="Resistance_C2_S2_Ohms" />
-                <ScalarProperty Name="Resistance_C2_S3_Ohms" ColumnName="Resistance_C2_S3_Ohms" />
-                <ScalarProperty Name="Resistance_C2_S4_Ohms" ColumnName="Resistance_C2_S4_Ohms" />
-                <ScalarProperty Name="Resistance_C2_S5_Ohms" ColumnName="Resistance_C2_S5_Ohms" />
-                <ScalarProperty Name="LM335_T1_degC" ColumnName="LM335_T1_degC" />
-                <ScalarProperty Name="LM335_T2_degC" ColumnName="LM335_T2_degC" />
-                <ScalarProperty Name="TOW_Current_1_amp" ColumnName="TOW_Current_1_amp" />
-                <ScalarProperty Name="TOW_Current_2_amp" ColumnName="TOW_Current_2_amp" />
-                <ScalarProperty Name="Vaisala_Temp_degC" ColumnName="Vaisala_Temp_degC" />
-                <ScalarProperty Name="Vaisala_RH__PR" ColumnName="Vaisala_RH__PR" />
-                <ScalarProperty Name="PWR_OUT_V_2" ColumnName="PWR_OUT_V_2" />
-                <ScalarProperty Name="Internal_6_V" ColumnName="Internal_6_V" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="t_Pollutant_Deposition">
             <EntityTypeMapping TypeName="CorrosionModelModel.t_Pollutant_Deposition">
               <MappingFragment StoreEntitySet="t_Pollutant_Deposition">
@@ -814,6 +787,36 @@ warning 6002: The table/view 'CorrosionModelRelease.dbo.t_Pollutant_Deposition' 
                 <ScalarProperty Name="pH" ColumnName="pH" />
                 <ScalarProperty Name="RainConc" ColumnName="RainConc" />
                 <ScalarProperty Name="RainDeposit" ColumnName="RainDeposit" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="t_ErrorList">
+            <EntityTypeMapping TypeName="CorrosionModelModel.t_ErrorList">
+              <MappingFragment StoreEntitySet="t_ErrorList">
+                <ScalarProperty Name="EMAILTITLE" ColumnName="EMAILTITLE" />
+                <ScalarProperty Name="ERRORDATE" ColumnName="ERRORDATE" />
+                <ScalarProperty Name="ERRORMESSAGE" ColumnName="ERRORMESSAGE" />
+                <ScalarProperty Name="MESSAGEUID" ColumnName="MESSAGEUID" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="t_Sensor_Data">
+            <EntityTypeMapping TypeName="CorrosionModelModel.t_Sensor_Data">
+              <MappingFragment StoreEntitySet="t_Sensor_Data">
+                <ScalarProperty Name="Rain" ColumnName="Rain" />
+                <ScalarProperty Name="Battery" ColumnName="Battery" />
+                <ScalarProperty Name="ResistanceReference" ColumnName="ResistanceReference" />
+                <ScalarProperty Name="TC2Cold" ColumnName="TC2Cold" />
+                <ScalarProperty Name="TC2" ColumnName="TC2" />
+                <ScalarProperty Name="TC1" ColumnName="TC1" />
+                <ScalarProperty Name="TOW" ColumnName="TOW" />
+                <ScalarProperty Name="Corr2" ColumnName="Corr2" />
+                <ScalarProperty Name="Corr1" ColumnName="Corr1" />
+                <ScalarProperty Name="SHTRH" ColumnName="SHTRH" />
+                <ScalarProperty Name="SHTTemp" ColumnName="SHTTemp" />
+                <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

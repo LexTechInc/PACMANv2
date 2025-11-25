@@ -2,6 +2,7 @@
 using RandomNumberGenerator;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace PACMAN
         Random r = new Random();
         MathNet.Numerics.Distributions.Normal normalDist = new Normal(0, 1);
 
-        public CorrosionData BeginAnalysisSingle(List<CombinedDataViewModel> fileData, int location, Dictionary<string, PollutionModel> pollutionData)
+        public CorrosionData BeginAnalysisSingle(List<CombinedDataViewModel> fileData, int location, Dictionary<string, PollutionModel> pollutionData, bool createNewDamageCharts)
         {
             SimpleRNG.SetSeedFromSystemTime();
             CorrosionData cd = new CorrosionData();
@@ -50,13 +51,16 @@ namespace PACMAN
                 sd.col9 = s.Month;
                 if (location == 0)
                 {
-                    sd.Location = 9;
+                    sd.Location = Convert.ToInt32(ConfigurationManager.AppSettings["Location"]);
                 }
                 else
                 {
                     sd.Location = location;
                 }
                 sd.col10 = s.DataSourceType;
+                sd.corr1 = s.corr1;
+                sd.corr2 = s.corr2;
+                sd.corrTemp = s.corrTemp;
                 sensorData.Add(sd);
             }
 
@@ -73,6 +77,10 @@ namespace PACMAN
             SensorCalib(_task, ref enviroP_List, sensorData, ref cd, numTasks);
             double[,,] PitString = coelesence(ref enviroP_List, _task);
             pit(ref enviroP_List, _task, PitString, ref cd);
+            if(createNewDamageCharts) 
+            {
+                newCorr(sensorData, ref cd);
+            }
 
             return cd;
         }
@@ -856,6 +864,10 @@ namespace PACMAN
                 count++;
 
             }//endfor 
+            cd.Temperature.Add(temperatureSum / entriesPerDay);
+            cd.RelativeHumidity.Add(relativeHumiditySum / entriesPerDay);
+            cd.Y.Add(currentDate);
+
 
             enviroP_List[0][0].col0 = p;
             enviroP_List[0][0].col1 = _task.CrystalSize;
@@ -1915,7 +1927,10 @@ namespace PACMAN
                         {
 
                         }
-                        steelIndex++;
+                        if (steelIndex < ((_enviroP_List[0][0].col0)))
+                        {
+                            steelIndex++;
+                        }
                     }
                 }
                 catch (Exception error)
@@ -2187,6 +2202,103 @@ namespace PACMAN
             double rangeMax = value;
             double randomValue = rangeMin + (rangeMax - rangeMin) * r.NextDouble();
             return randomValue;
+        }
+
+        public void newCorr(List<combinedData> sensorData, ref CorrosionData cd)
+        {
+            List<double> corr1List = new List<double>();
+            List<double> corr2List = new List<double>();
+            List<DateTime> dateList = new List<DateTime>();
+
+            if (sensorData.Count > 0)
+            {
+                double firstItemResistValue1 = ((0.00000012911 / ((0.0000000006796) * sensorData[0].corrTemp + 0.00000012917)) * sensorData[0].corr1) - (0.00000012911 * 0.065 / (0.00005 * 0.005));//e4
+                double firstItemResistValue2 = ((0.00000012911 / ((0.0000000006796) * sensorData[0].corrTemp + 0.00000012917)) * sensorData[0].corr2) - (0.00000012911 * 0.065 / (0.00005 * 0.005));//e4
+                double firstItemExposed1 = ((0.00000012911 / ((0.0000000006796) * sensorData[0].corrTemp + 0.00000012917)) * sensorData[0].corr1) - firstItemResistValue1; //e7
+                double firstItemExposed2 = ((0.00000012911 / ((0.0000000006796) * sensorData[0].corrTemp + 0.00000012917)) * sensorData[0].corr2) - firstItemResistValue2; //e7
+
+                double firstItemTemp = sensorData[0].corrTemp;
+
+                foreach (combinedData sensorDataItem in sensorData)
+                {
+                    double corr1Value = sensorDataItem.corr1;
+                    double corr2Value = sensorDataItem.corr1;
+                    double temp = sensorDataItem.corrTemp;
+
+                    double resist1 = (0.00000012911 / ((0.0000000006796) * temp + 0.00000012917)) * corr1Value;
+                    double resist2 = (0.00000012911 / ((0.0000000006796) * temp + 0.00000012917)) * corr2Value;
+
+                    double exposed1 = resist1 - firstItemResistValue1;
+                    double exposed2 = resist2 - firstItemResistValue2;
+
+                    double sectionalLoss1 = 51 - (firstItemExposed1 * 51 / exposed1);
+                    double sectionalLoss2 = 50 - (firstItemExposed2 * 51 / exposed2);
+
+                    corr1List.Add(sectionalLoss1);
+                    corr2List.Add(sectionalLoss2);
+
+                    dateList.Add(sensorDataItem.col8);
+
+                }
+
+                List <CorrosionDataPoint> corr1Values = new List < CorrosionDataPoint >();
+                List<CorrosionDataPoint> corr2Values = new List<CorrosionDataPoint>();
+
+                double corr1Total = 0;
+                double corr2Total = 0;
+                int items = 0;
+                int days = 1;
+
+                DateTime currentDate = dateList[0];
+                for (int i = 0;i < dateList.Count;i++)
+                {
+                    if (dateList[i].Day == currentDate.Day)
+                    {
+                        corr1Total += corr1List[i];
+                        corr2Total += corr2List[i];
+                        items++;
+                    }
+                    else
+                    {
+                        CorrosionDataPoint cdp1 = new CorrosionDataPoint();
+                        cdp1.Value = (corr1Total / items);
+                        cdp1.Series = days;
+                        corr1Values.Add(cdp1);
+
+                        CorrosionDataPoint cdp2 = new CorrosionDataPoint();
+                        cdp2.Value = (corr2Total / items);
+                        cdp2.Series = days;
+                        corr2Values.Add(cdp2);
+
+                        corr1Total = 0;
+                        corr2Total = 0;
+                        items = 0;
+                        currentDate = dateList[i];
+                        days++;
+
+                        corr1Total += corr1List[i];
+                        corr2Total += corr2List[i];
+                        items++;
+                    }
+
+                }
+                if (items > 0)
+                {
+                    CorrosionDataPoint cdp1 = new CorrosionDataPoint();
+                    cdp1.Value = (corr1Total / items);
+                    cdp1.Series = days;
+                    corr1Values.Add(cdp1);
+
+                    CorrosionDataPoint cdp2 = new CorrosionDataPoint();
+                    cdp2.Value = (corr2Total / items);
+                    cdp2.Series = days;
+                    corr2Values.Add(cdp2);
+                }
+
+                cd.Corr1Values = corr1Values;
+                cd.Corr2Values = corr2Values;
+            }
+
         }
     }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace PACMAN
 {
@@ -38,6 +39,12 @@ namespace PACMAN
         public int col9 { get; set; } //Month
         public int col10 { get; set; } //Sensor = 1, Meterological = 2
         public int Location { get; set; }
+
+        public double corr1 { get; set; }
+
+        public double corr2 { get; set; }
+
+        public double corrTemp { get; set;}
     }
 
     public class enviroP
@@ -74,25 +81,87 @@ namespace PACMAN
 
     public class PollutionModel
     {
+        //[Required(ErrorMessage = "Deposit is required.")]
         public double Deposit { get; set; }
+        //[Required(ErrorMessage = "Min Salts is required.")]
         public double Sea { get; set; }
+        //[Required(ErrorMessage = "NH4NO3 is required.")]
         public double AmmNit { get; set; }
+        //[Required(ErrorMessage = "(NH4)2S04 is required.")]
         public double AmmSul { get; set; }
+        //[Required(ErrorMessage = "pH is required.")]
         public double RainDep { get; set; }
+        //[Required(ErrorMessage = "Conc is required.")]
         public double RainConc { get; set; }
+        //[Required(ErrorMessage = "NaCl is required.")]
         public double NaCl { get; set; }
+        //[Required(ErrorMessage = "MgC12 is required.")]
         public double MgCl2 { get; set; }
+        //[Required(ErrorMessage = "Na2S04 is required.")]
         public double Na2S04 { get; set; }
+        //[Required(ErrorMessage = "CaC12 is required.")]
         public double CaC12 { get; set; }
+        //[Required(ErrorMessage = "KCI is required.")]
         public double KCI { get; set; }
+        //[Required(ErrorMessage = "MgSO4 is required.")]
         public double MgSO4 { get; set; }
+        //[Required(ErrorMessage = "K2SO4 is required.")]
         public double K2SO4 { get; set; }
+        //[Required(ErrorMessage = "CaSO4 is required.")]
         public double CaSO4 { get; set; }
+        //[Required(ErrorMessage = "Total is required.")]
         public double total { get; set; }
+        //[Required(ErrorMessage = "H2SO4 is required.")]
         public double? HSMass { get; set; }
+        //[Required(ErrorMessage = "HNO3 is required.")]
         public double? HNMass { get; set; }
 
         public int Location { get; set; }
+
+        public string MonthName { get; set; }
+        public int Month { get; set; }
+    }
+
+    public class GridPollutionModel
+    {
+        //[Required(ErrorMessage = "Deposit is required.")]
+        public double? Deposit { get; set; }
+        //[Required(ErrorMessage = "Min Salts is required.")]
+        public double? Sea { get; set; }
+        //[Required(ErrorMessage = "NH4NO3 is required.")]
+        public double? AmmNit { get; set; }
+        //[Required(ErrorMessage = "(NH4)2S04 is required.")]
+        public double? AmmSul { get; set; }
+        //[Required(ErrorMessage = "pH is required.")]
+        public double? RainDep { get; set; }
+        //[Required(ErrorMessage = "Conc is required.")]
+        public double? RainConc { get; set; }
+        //[Required(ErrorMessage = "NaCl is required.")]
+        public double? NaCl { get; set; }
+        //[Required(ErrorMessage = "MgC12 is required.")]
+        public double? MgCl2 { get; set; }
+        //[Required(ErrorMessage = "Na2S04 is required.")]
+        public double? Na2S04 { get; set; }
+        //[Required(ErrorMessage = "CaC12 is required.")]
+        public double? CaC12 { get; set; }
+        //[Required(ErrorMessage = "KCI is required.")]
+        public double? KCI { get; set; }
+        //[Required(ErrorMessage = "MgSO4 is required.")]
+        public double? MgSO4 { get; set; }
+        //[Required(ErrorMessage = "K2SO4 is required.")]
+        public double? K2SO4 { get; set; }
+        //[Required(ErrorMessage = "CaSO4 is required.")]
+        public double? CaSO4 { get; set; }
+        //[Required(ErrorMessage = "Total is required.")]
+        public double? total { get; set; }
+        //[Required(ErrorMessage = "H2SO4 is required.")]
+        public double? HSMass { get; set; }
+        //[Required(ErrorMessage = "HNO3 is required.")]
+        public double? HNMass { get; set; }
+
+        public int Location { get; set; }
+
+        public string MonthName { get; set; }
         public int Month { get; set; }
     }
 
@@ -142,6 +211,12 @@ namespace PACMAN
         public int Month { get; set; }
         public int Location { get; set; }
         public int DataSourceType { get; set; }
+
+        public double corr1 { get; set; }
+
+        public double corr2 { get; set; }
+
+        public double corrTemp { get; set;}
     }
 
     public enum MetDataTypes

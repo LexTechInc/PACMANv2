@@ -36,7 +36,8 @@ namespace PACMAN
         public virtual DbSet<t_Parameter_List> t_Parameter_List { get; set; }
         public virtual DbSet<t_Parameters> t_Parameters { get; set; }
         public virtual DbSet<t_Salt_Composition> t_Salt_Composition { get; set; }
-        public virtual DbSet<t_Sensor_Data> t_Sensor_Data { get; set; }
         public virtual DbSet<t_Pollutant_Deposition> t_Pollutant_Deposition { get; set; }
+        public virtual DbSet<t_ErrorList> t_ErrorList { get; set; }
+        public virtual DbSet<t_Sensor_Data> t_Sensor_Data { get; set; }
     }
 }

@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="7d60c0b4a1544ce2835be23372172327" Name="Diagram1">
+      <Diagram DiagramId="7d60c0b4a1544ce2835be23372172327" Name="Diagram1" ZoomLevel="86">
         <EntityTypeShape EntityType="CorrosionModelModel.CombinedData" Width="1.5" PointX="5.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="CorrosionModelModel.MetData" Width="1.5" PointX="7.75" PointY="3.75" IsExpanded="true" />
         <EntityTypeShape EntityType="CorrosionModelModel.t_Base_Properties" Width="1.5" PointX="7.75" PointY="7.75" IsExpanded="true" />
@@ -16,14 +16,15 @@
         <EntityTypeShape EntityType="CorrosionModelModel.t_Parameter_List" Width="1.5" PointX="8" PointY="0.875" IsExpanded="true" />
         <EntityTypeShape EntityType="CorrosionModelModel.t_Parameters" Width="1.5" PointX="5.75" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="CorrosionModelModel.t_Salt_Composition" Width="1.5" PointX="9.75" PointY="9.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="CorrosionModelModel.t_Sensor_Data" Width="1.5" PointX="3" PointY="7.875" IsExpanded="true" />
         <EntityTypeShape EntityType="CorrosionModelModel.t_Pollutant_Deposition" Width="1.5" PointX="3" PointY="14.25" IsExpanded="true" />
         <AssociationConnector Association="CorrosionModelModel.FK__t_Flights__Desti__30C33EC3" ManuallyRouted="false" />
         <AssociationConnector Association="CorrosionModelModel.FK__t_Flights__From___2FCF1A8A" ManuallyRouted="false" />
         <AssociationConnector Association="CorrosionModelModel.FK__t_History__Locat__2B0A656D" ManuallyRouted="false" />
         <AssociationConnector Association="CorrosionModelModel.FK__t_Polluta__Locat__4F47C5E3" ManuallyRouted="false" />
-        <AssociationConnector Association="CorrosionModelModel.FK_t_Sensor_Data" ManuallyRouted="false" />
         <AssociationConnector Association="CorrosionModelModel.FK_t_Parameter_List" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="CorrosionModelModel.t_ErrorList" Width="1.5" PointX="10.375" PointY="0.75" />
+        <EntityTypeShape EntityType="CorrosionModelModel.t_Sensor_Data" Width="1.5" PointX="3" PointY="8" />
+        <AssociationConnector Association="CorrosionModelModel.FK_t_Sensor_Data" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

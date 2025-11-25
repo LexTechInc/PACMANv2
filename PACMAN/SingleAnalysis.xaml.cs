@@ -3,6 +3,7 @@ using Microsoft.Win32;
 using SharpDX.Collections;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,9 +29,17 @@ namespace PACMAN
         public bool canceled = true;
         public string selectedFileName { get; set; }
 
-        public SingleAnalysis()
+        private Dictionary<string, int> locationValues = new Dictionary<string, int>();
+
+        public SingleAnalysis(List<t_Location> locations)
         {
             InitializeComponent();
+            locationValues.Add("This Location", Convert.ToInt32(ConfigurationManager.AppSettings["Location"]));
+            foreach (var location in locations)
+            {
+                locationValues.Add(location.Name, location.Id);
+                locationSelect.Items.Add(location.Name);
+            }
         }
 
         private void SelectFile_Click(object sender, RoutedEventArgs e)
@@ -51,63 +60,16 @@ namespace PACMAN
                 MessageBoxResult result = MessageBox.Show("Please select a file", "Input Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else{
-                RadComboBoxItem selectedValue = locationSelect.SelectedItem as RadComboBoxItem;
+                string selectedValue = locationSelect.SelectedItem as string;
                 canceled = false;
-                if (selectedValue == null || selectedValue.Content.ToString() == "")
+                if (selectedValue == null || selectedValue == "")
                 {
                     MessageBoxResult result = MessageBox.Show("Please select a location", "Input Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 else
                 {
-                    if (selectedValue.Content.ToString() == "Singapore")
-                    {
-                        locationValue = 9;
-                        locationString = selectedValue.Content.ToString();
-                    }
-                    else if (selectedValue.Content.ToString() == "Industrial (Hill Air Force Base)")
-                    {
-                        locationValue = 6;
-                        locationString = selectedValue.Content.ToString();
-                    }
-                    else if (selectedValue.Content.ToString() == "Industrial/Agricultural (Wright Patt Air Force Base)")
-                    {
-                        locationValue = 4;
-                        locationString = selectedValue.Content.ToString();
-                    }
-                    else if (selectedValue.Content.ToString() == "Marine (Key West Air Force Base)")
-                    {
-                        locationValue = 8;
-                        locationString = selectedValue.Content.ToString();
-                    }
-                    else if (selectedValue.Content.ToString() == "Marine/Agricultural (Eglin Air Force Base)")
-                    {
-                        locationValue = 2;
-                        locationString = selectedValue.Content.ToString();
-                    }
-                    else if (selectedValue.Content.ToString() == "Marine Sheltered (Hickam Air Force Base)")
-                    {
-                        locationValue = 5;
-                    }
-                    else if (selectedValue.Content.ToString() == "Rural (Tinker Air Force Base)")
-                    {
-                        locationValue = 3;
-                        locationString = selectedValue.Content.ToString();
-                    }
-                    else if (selectedValue.Content.ToString() == "Rural/Arid (Luke Air Force Base)")
-                    {
-                        locationValue = 7;
-                        locationString = selectedValue.Content.ToString();
-                    }
-                    else if (selectedValue.Content.ToString() == "Severe Marine (Guam Air Force Base)")
-                    {
-                        locationValue = 1;
-                        locationString = selectedValue.Content.ToString();
-                    }
-                    else
-                    {
-                        locationValue = 9;
-                        locationString = "Singapore";
-                    }
+                    locationValue = locationValues[selectedValue];
+                    locationString = selectedValue;                   
                     Close();
                 }
             }

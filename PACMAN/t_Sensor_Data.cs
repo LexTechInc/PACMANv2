@@ -16,27 +16,17 @@ namespace PACMAN
     {
         public int Location { get; set; }
         public System.DateTime Timestamp { get; set; }
-        public string TZ { get; set; }
-        public int PWR_OUT_V_1 { get; set; }
-        public int Delay_4_Vaisala_ms { get; set; }
-        public double Resistance_C1_S1_Ohms { get; set; }
-        public double Resistance_C1_S2_Ohms { get; set; }
-        public double Resistance_C1_S3_Ohms { get; set; }
-        public double Resistance_C1_S4_Ohms { get; set; }
-        public double Resistance_C1_S5_Ohms { get; set; }
-        public double Resistance_C2_S1_Ohms { get; set; }
-        public double Resistance_C2_S2_Ohms { get; set; }
-        public double Resistance_C2_S3_Ohms { get; set; }
-        public double Resistance_C2_S4_Ohms { get; set; }
-        public double Resistance_C2_S5_Ohms { get; set; }
-        public double LM335_T1_degC { get; set; }
-        public double LM335_T2_degC { get; set; }
-        public double TOW_Current_1_amp { get; set; }
-        public double TOW_Current_2_amp { get; set; }
-        public double Vaisala_Temp_degC { get; set; }
-        public double Vaisala_RH__PR { get; set; }
-        public int PWR_OUT_V_2 { get; set; }
-        public double Internal_6_V { get; set; }
+        public double SHTTemp { get; set; }
+        public double SHTRH { get; set; }
+        public double Corr1 { get; set; }
+        public double Corr2 { get; set; }
+        public double TOW { get; set; }
+        public double TC1 { get; set; }
+        public double TC2 { get; set; }
+        public double TC2Cold { get; set; }
+        public double ResistanceReference { get; set; }
+        public double Battery { get; set; }
+        public bool Rain { get; set; }
     
         public virtual t_Location t_Location { get; set; }
     }

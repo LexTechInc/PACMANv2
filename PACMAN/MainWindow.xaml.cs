@@ -37,7 +37,7 @@ using MathNet.Numerics.LinearAlgebra.Factorization;
 using System.Collections;
 using System.Runtime.Remoting.Contexts;
 using System.Windows.Markup;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+//using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 //using SharpDX.Direct2D1;
 
 namespace PACMAN
@@ -79,10 +79,10 @@ namespace PACMAN
             if (ConfigurationManager.AppSettings["ErrorFilePath"] == "%Documents%")
             {
             string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-            config.AppSettings.Settings["ErrorFilePath"].Value = documentsPath;
-            config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection("appSettings");
+                errorFilePath = documentsPath + "\\ErrorFile1";
+                errorFilePath1 = documentsPath + "\\ErrorFile1";
+                errorFilePath2 = documentsPath + "\\ErrorFile2";
+                errorFilePath3 = documentsPath + "\\ErrorFile3";
             }
             errorFilePath = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
             errorFilePath1 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";

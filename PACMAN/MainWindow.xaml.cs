@@ -78,16 +78,19 @@ namespace PACMAN
             StyleManager.ApplicationTheme = new VisualStudio2013Theme();
             if (ConfigurationManager.AppSettings["ErrorFilePath"] == "%Documents%")
             {
-            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 errorFilePath = documentsPath + "\\ErrorFile1";
                 errorFilePath1 = documentsPath + "\\ErrorFile1";
                 errorFilePath2 = documentsPath + "\\ErrorFile2";
                 errorFilePath3 = documentsPath + "\\ErrorFile3";
             }
-            errorFilePath = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
-            errorFilePath1 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
-            errorFilePath2 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile2";
-            errorFilePath3 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile3";
+            else
+            {
+                errorFilePath = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
+                errorFilePath1 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
+                errorFilePath2 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile2";
+                errorFilePath3 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile3";
+            }
             InitializeComponent();
             
             ToggleLoadingVisability(false);

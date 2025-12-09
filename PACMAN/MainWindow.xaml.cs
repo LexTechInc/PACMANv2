@@ -37,6 +37,7 @@ using MathNet.Numerics.LinearAlgebra.Factorization;
 using System.Collections;
 using System.Runtime.Remoting.Contexts;
 using System.Windows.Markup;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 //using SharpDX.Direct2D1;
 
 namespace PACMAN
@@ -66,15 +67,27 @@ namespace PACMAN
 
         public List<CorrosionDataPoint> steelCorr2Points { get; set; }
 
-        string errorFilePath = ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile1";
-        string errorFilePath1 = ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile1";
-        string errorFilePath2 = ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile2";
-        string errorFilePath3 = ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile3";
+        string errorFilePath = "";//ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile1";
+        string errorFilePath1 = "";//ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile1";
+        string errorFilePath2 = "";//ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile2";
+        string errorFilePath3 = "";//ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile3";
         const int sizeLimitInBytes = 500 * 1024 * 1024; //500 * 1024 * 1024 is a limit of 500 MB
 
         public MainWindow()
         {
             StyleManager.ApplicationTheme = new VisualStudio2013Theme();
+            if (ConfigurationManager.AppSettings["ErrorFilePath"] == "%Documents%")
+            {
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["ErrorFilePath"].Value = documentsPath;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection("appSettings");
+            }
+            errorFilePath = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
+            errorFilePath1 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
+            errorFilePath2 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile2";
+            errorFilePath3 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile3";
             InitializeComponent();
             
             ToggleLoadingVisability(false);
@@ -762,68 +775,109 @@ namespace PACMAN
             addLocationDlg.ShowDialog();
             if (addLocationDlg.canceled == false)
             {
-
-                List<t_Location> locations = new List<t_Location>();
-                using (var context = new CorrosionModelEntities())
+                try
                 {
-                    locations = context.t_Location.ToList();
-                }
-
-                int newIndex = 0;
-                foreach(t_Location location in locations)
-                {
-                    if(location.Id > newIndex)
-                    {
-                        newIndex = location.Id;
-                    }
-                }
-                newIndex++;
-
-                t_Location newLocation = new t_Location();
-                newLocation.Id = newIndex;
-                newLocation.Name = addLocationDlg.LocationName;
-                using (var context = new CorrosionModelEntities())
-                {
-                    context.t_Location.Add(newLocation);
-                    context.SaveChanges();
-                }
-
-                foreach (PollutionModel pm in addLocationDlg.gridResults)
-                {
-                    t_Salt_Composition salt = new t_Salt_Composition();
-                    t_Base_Properties baseProp = new t_Base_Properties();
-
-                    baseProp.Salt_dep = pm.Deposit;
-                    baseProp.Conc = pm.RainConc;
-                    baseProp.pH = pm.RainDep;
-                    baseProp.Month = pm.Month;
-                    baseProp.Location = newIndex;
-
-                    salt.NH4NO3 = pm.AmmNit;
-                    salt.NH42SO4 = pm.AmmSul;
-                    salt.NaCl = pm.NaCl;
-                    salt.MgC12 = pm.MgCl2;
-                    salt.Na2S04 = pm.Na2S04;
-                    salt.CaC12 = pm.CaC12;
-                    salt.KCI = pm.KCI;
-                    salt.MgSO4 = pm.MgSO4;
-                    salt.K2SO4 = pm.K2SO4;
-                    salt.CaSO4 = pm.CaSO4;
-                    salt.Total = pm.total;
-                    salt.HSMass = pm.HSMass;
-                    salt.HNMass = pm.HNMass;
-                    salt.MinSalts = pm.Sea;
-                    salt.Month = pm.Month;
-                    salt.Location = newIndex;
-
+                    List<t_Location> locations = new List<t_Location>();
                     using (var context = new CorrosionModelEntities())
                     {
-                        context.t_Base_Properties.Add(baseProp);
-                        context.t_Salt_Composition.Add(salt);
+                        locations = context.t_Location.ToList();
+                    }
+
+                    int newIndex = 0;
+                    foreach (t_Location location in locations)
+                    {
+                        if (location.Id > newIndex)
+                        {
+                            newIndex = location.Id;
+                        }
+                    }
+                    newIndex++;
+
+                    t_Location newLocation = new t_Location();
+                    newLocation.Id = newIndex;
+                    newLocation.Name = addLocationDlg.LocationName;
+                    using (var context = new CorrosionModelEntities())
+                    {
+                        context.t_Location.Add(newLocation);
                         context.SaveChanges();
                     }
-                }
 
+                    foreach (PollutionModel pm in addLocationDlg.gridResults)
+                    {
+                        t_Salt_Composition salt = new t_Salt_Composition();
+                        t_Base_Properties baseProp = new t_Base_Properties();
+
+                        baseProp.Salt_dep = pm.Deposit;
+                        baseProp.Conc = pm.RainConc;
+                        baseProp.pH = pm.RainDep;
+                        baseProp.Month = pm.Month;
+                        baseProp.Location = newIndex;
+
+                        salt.NH4NO3 = pm.AmmNit;
+                        salt.NH42SO4 = pm.AmmSul;
+                        salt.NaCl = pm.NaCl;
+                        salt.MgC12 = pm.MgCl2;
+                        salt.Na2S04 = pm.Na2S04;
+                        salt.CaC12 = pm.CaC12;
+                        salt.KCI = pm.KCI;
+                        salt.MgSO4 = pm.MgSO4;
+                        salt.K2SO4 = pm.K2SO4;
+                        salt.CaSO4 = pm.CaSO4;
+                        salt.Total = pm.total;
+                        salt.HSMass = pm.HSMass;
+                        salt.HNMass = pm.HNMass;
+                        salt.MinSalts = pm.Sea;
+                        salt.Month = pm.Month;
+                        salt.Location = newIndex;
+
+                        using (var context = new CorrosionModelEntities())
+                        {
+                            context.t_Base_Properties.Add(baseProp);
+                            context.t_Salt_Composition.Add(salt);
+                            context.SaveChanges();
+                        }
+                    }
+                }
+                catch (System.Data.SqlClient.SqlException ex)
+                {
+                    using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                    {
+                        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                        {
+                            builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                        });
+
+                        ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+
+                        DateTime now = DateTime.Now;
+                        using (logger.BeginScope("[scope is enabled]"))
+                        {
+                            logger.LogInformation(now + ": Error Connecting to Database: " + ex.Message);
+                        }
+                    }
+
+                    MessageBoxResult result = MessageBox.Show("Error Connecting to Database: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                catch (Exception error)
+                {
+                    using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                    {
+                        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                        {
+                            builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                        });
+
+                        ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+
+                        DateTime now = DateTime.Now;
+                        using (logger.BeginScope("[scope is enabled]"))
+                        {
+                            logger.LogInformation(now + ": General Error Occured when updating database: " + error.Message);
+                        }
+                    }
+
+                    MessageBoxResult result = MessageBox.Show("General Error Occured when updating database: " + error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
         }
 
@@ -850,9 +904,52 @@ namespace PACMAN
             //IncrementLoadingBar("Begining Analysis", 10);
 
             List<t_Location> locations = new List<t_Location>();
-            using (var context = new CorrosionModelEntities())
+            try
             {
-                locations = context.t_Location.ToList();
+                using (var context = new CorrosionModelEntities())
+                {
+                    locations = context.t_Location.ToList();
+                }
+            }
+            catch (System.Data.SqlClient.SqlException ex)
+            {
+                using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                {
+                    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                    {
+                        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                    });
+
+                    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+
+                    DateTime now = DateTime.Now;
+                    using (logger.BeginScope("[scope is enabled]"))
+                    {
+                        logger.LogInformation(now + ": Error Connecting to Database: " + ex.Message);
+                    }
+                }
+
+                MessageBoxResult result = MessageBox.Show("Error Connecting to Database: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            catch (Exception error)
+            {
+                using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                {
+                    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                    {
+                        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                    });
+
+                    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+
+                    DateTime now = DateTime.Now;
+                    using (logger.BeginScope("[scope is enabled]"))
+                    {
+                        logger.LogInformation(now + ": General Error Occured when connecting to database: " + error.Message);
+                    }
+                }
+
+                MessageBoxResult result = MessageBox.Show("General Error Occured when connecting to database: " + error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             var timespanAnalysisWindow = new TimespanAnalysis(locations);

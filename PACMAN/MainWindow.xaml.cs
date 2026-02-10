@@ -31,13 +31,16 @@ using System.Configuration;
 using System.Net.Mail;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+
 using Telerik.Windows.Controls.Legend;
 using Telerik.Windows.Controls.Map;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using System.Collections;
 using System.Runtime.Remoting.Contexts;
 using System.Windows.Markup;
-//using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using Org.BouncyCastle.Operators;
+using System.Windows.Interop;
+
 //using SharpDX.Direct2D1;
 
 namespace PACMAN
@@ -68,29 +71,20 @@ namespace PACMAN
         public List<CorrosionDataPoint> steelCorr2Points { get; set; }
 
         string errorFilePath = "";//ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile1";
-        string errorFilePath1 = "";//ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile1";
-        string errorFilePath2 = "";//ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile2";
-        string errorFilePath3 = "";//ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile3";
+       
         const int sizeLimitInBytes = 500 * 1024 * 1024; //500 * 1024 * 1024 is a limit of 500 MB
 
         public MainWindow()
         {
+            
             StyleManager.ApplicationTheme = new VisualStudio2013Theme();
-            if (ConfigurationManager.AppSettings["ErrorFilePath"] == "%Documents%")
+            string documentsPath = ConfigurationManager.AppSettings["ErrorFilePath"];
+            if (documentsPath == "%Documents%")
             {
-                string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                errorFilePath = documentsPath + "\\ErrorFile1";
-                errorFilePath1 = documentsPath + "\\ErrorFile1";
-                errorFilePath2 = documentsPath + "\\ErrorFile2";
-                errorFilePath3 = documentsPath + "\\ErrorFile3";
+                documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             }
-            else
-            {
-                errorFilePath = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
-                errorFilePath1 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile1";
-                errorFilePath2 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile2";
-                errorFilePath3 = ConfigurationManager.AppSettings["ErrorFilePath"] + "\\ErrorFile3";
-            }
+            errorFilePath = documentsPath + "\\ErrorFilePacman.log";
+           
             InitializeComponent();
             
             ToggleLoadingVisability(false);
@@ -110,6 +104,76 @@ namespace PACMAN
             PitDistributionChart.VerticalAxis.Title = "Pit Count";
             SteelWeightLossChart.HorizontalAxis.Title = "Time(days)";
             SteelWeightLossChart.VerticalAxis.Title = "mm";
+
+
+            //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+            //{
+            //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+            //    {
+            //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+            //    });
+
+            //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+            //    DateTime now = DateTime.Now;
+            //    using (logger.BeginScope("[scope is enabled]"))
+            //    {
+            //        logger.LogInformation(now + ": Application Started ");
+            //    }
+            //}
+
+            Log_Event("Application Started");
+
+        }
+        private void Log_Event(string msg)
+        {
+            try
+            {
+                using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                {
+                    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                    {
+                        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                    });
+
+                    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                    DateTime now = DateTime.Now;
+                    using (logger.BeginScope("[scope is enabled]"))
+                    {
+                        logger.LogInformation(now + ": " + msg);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Error encountered during analysis: " + ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Show confirmation dialog
+            //var result = MessageBox.Show("Are you sure you want to close?", "Confirm", MessageBoxButton.YesNo);
+
+            //// Cancel closure if user selects "No"
+            //if (result == MessageBoxResult.No)
+            //{
+            //    e.Cancel = true;
+            //}
+
+            //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+            //{
+            //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+            //    {
+            //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+            //    });
+
+            //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+            //    DateTime now = DateTime.Now;
+            //    using (logger.BeginScope("[scope is enabled]"))
+            //    {
+            //        logger.LogInformation(now + ": Application Closing");
+            //    }
+            //}
+            Log_Event("Application Closing");
         }
 
         private void downloadDroplets_Click(object sender, RoutedEventArgs e)
@@ -362,9 +426,7 @@ namespace PACMAN
             List<t_Sensor_Data> entryList = new List<t_Sensor_Data>();
             List<t_ErrorList> errorList = new List<t_ErrorList>();
             //string errorFilePath = "|DataDirectory|\\ErrorLog.txt";
-            string errorFilePath1 = ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile1";
-            string errorFilePath2 = ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile2";
-            string errorFilePath3 = ConfigurationManager.AppSettings["ErrorFilePath"] + "ErrorFile3";
+           
             DateTime now = new DateTime();
             using (var client = new ImapClient(new ProtocolLogger("imap.log")))
             {
@@ -532,51 +594,26 @@ namespace PACMAN
                                                 error.ERRORDATE = DateTime.Now;
                                                 error.EMAILTITLE = message.Subject;
                                                 //errorList.Add(error);
-                                                long length = 0;
-                                                try
-                                                {
-                                                    length = new System.IO.FileInfo(errorFilePath).Length;
-                                                    if (length > sizeLimitInBytes)
-                                                    {
-                                                        if (errorFilePath.Contains("ErrorFile1"))
-                                                        {
-                                                            errorFilePath = errorFilePath2;
-                                                        }
-                                                        else if (errorFilePath.Contains("ErrorFile2"))
-                                                        {
-                                                            errorFilePath = errorFilePath3;
-                                                        }
-                                                        else if (errorFilePath.Contains("ErrorFile3"))
-                                                        {
-                                                            errorFilePath = errorFilePath1;
-                                                        }
-                                                        else
-                                                        {
-                                                            errorFilePath = errorFilePath1;
-                                                        }
-                                                    }
-                                                }
-                                                catch (Exception exc)
-                                                {
-
-                                                }
+                                                
 
 
-                                                using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
-                                                {
-                                                    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                                                    {
-                                                        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                                                //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                                                //{
+                                                //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                                                //    {
+                                                //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
                                                         
-                                                    });
+                                                //    });
 
-                                                    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
-                                                    now = DateTime.Now;
-                                                    using (logger.BeginScope("[scope is enabled]"))
-                                                    {
-                                                        logger.LogInformation(now + ": Error Parsing Data in Message with subject " + message.Subject);
-                                                    }
-                                                }
+                                                //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                                                //    now = DateTime.Now;
+                                                //    using (logger.BeginScope("[scope is enabled]"))
+                                                //    {
+                                                //        logger.LogInformation(now + ": Error Parsing Data in Message with subject " + message.Subject);
+                                                //    }
+                                                //}
+
+                                                Log_Event( "Error Parsing Data in Message with subject " + message.Subject);
 
 
                                             }
@@ -595,51 +632,27 @@ namespace PACMAN
                                     error.ERRORDATE = DateTime.Now;
                                     error.EMAILTITLE = message.Subject;
 
-                                    long length = 0;
-                                    try
-                                    {
-                                        length = new System.IO.FileInfo(errorFilePath).Length;
-                                        if (length > sizeLimitInBytes)
-                                        {
-                                            if (errorFilePath.Contains("ErrorFile1"))
-                                            {
-                                                errorFilePath = errorFilePath2;
-                                            }
-                                            else if (errorFilePath.Contains("ErrorFile2"))
-                                            {
-                                                errorFilePath = errorFilePath3;
-                                            }
-                                            else if (errorFilePath.Contains("ErrorFile3"))
-                                            {
-                                                errorFilePath = errorFilePath1;
-                                            }
-                                            else
-                                            {
-                                                errorFilePath = errorFilePath1;
-                                            }
-                                        }
-                                    }
-                                    catch (Exception exc)
-                                    {
+                                    // long length = 0;
 
-                                    }
 
                                     //errorList.Add(error);
 
-                                    using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
-                                    {
-                                        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                                        {
-                                            builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
-                                        });
+                                    //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                                    //{
+                                    //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                                    //    {
+                                    //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                                    //    });
 
-                                        ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
-                                        now = DateTime.Now;
-                                        using (logger.BeginScope("[scope is enabled]"))
-                                        {
-                                            logger.LogInformation(now + ": Error Opening Message with subject " + message.Subject);
-                                        }
-                                    }
+                                    //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                                    //    now = DateTime.Now;
+                                    //    using (logger.BeginScope("[scope is enabled]"))
+                                    //    {
+                                    //        logger.LogInformation(now + ": Error Opening Message with subject " + message.Subject);
+                                    //    }
+                                    //}
+
+                                    Log_Event("Error Opening Message with subject " + message.Subject);
                                 }
                             }
                             inbox.MoveTo(item.UniqueId, archive);
@@ -650,49 +663,24 @@ namespace PACMAN
                 }
                 catch
                 {
-                    long length = 0;
-                    try
-                    {
-                        length = new System.IO.FileInfo(errorFilePath).Length;
-                        if (length > sizeLimitInBytes)
-                        {
-                            if (errorFilePath.Contains("ErrorFile1"))
-                            {
-                                errorFilePath = errorFilePath2;
-                            }
-                            else if (errorFilePath.Contains("ErrorFile2"))
-                            {
-                                errorFilePath = errorFilePath3;
-                            }
-                            else if (errorFilePath.Contains("ErrorFile3"))
-                            {
-                                errorFilePath = errorFilePath1;
-                            }
-                            else
-                            {
-                                errorFilePath = errorFilePath1;
-                            }
-                        }
-                    }
-                    catch (Exception exc)
-                    {
 
-                    }
 
-                    using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
-                    {
-                        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                        {
-                            builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
-                        });
+                    //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                    //{
+                    //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                    //    {
+                    //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                    //    });
 
-                        ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
-                        now = DateTime.Now;
-                        using (logger.BeginScope("[scope is enabled]"))
-                        {
-                            logger.LogInformation(now + ": Error Connecting to email server");
-                        }
-                    }
+                    //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                    //    now = DateTime.Now;
+                    //    using (logger.BeginScope("[scope is enabled]"))
+                    //    {
+                    //        logger.LogInformation(now + ": Error Connecting to email server");
+                    //    }
+                    //}
+
+                    Log_Event("Error Connecting to email server ");
                 }
             }
             using (var context = new CorrosionModelEntities())
@@ -701,60 +689,35 @@ namespace PACMAN
                 {
                     context.t_Sensor_Data.Add(sensorData);
                 }
-                foreach (var errors in errorList)
-                {
-                    //context.t_ErrorList.Add(errors);
-                }
+                //foreach (var errors in errorList)
+                //{
+                //    //context.t_ErrorList.Add(errors);
+                //}
                 try
                 {
                     context.SaveChanges();
                 }
                 catch (Exception ex)
                 {
-                    long length = 0;
-                    try
-                    {
-                        length = new System.IO.FileInfo(errorFilePath).Length;
-                        if (length > sizeLimitInBytes)
-                        {
-                            if (errorFilePath.Contains("ErrorFile1"))
-                            {
-                                errorFilePath = errorFilePath2;
-                            }
-                            else if (errorFilePath.Contains("ErrorFile2"))
-                            {
-                                errorFilePath = errorFilePath3;
-                            }
-                            else if (errorFilePath.Contains("ErrorFile3"))
-                            {
-                                errorFilePath = errorFilePath1;
-                            }
-                            else
-                            {
-                                errorFilePath = errorFilePath1;
-                            }
-                        }
-                    }
-                    catch (Exception exc)
-                    {
 
-                    }
 
-                    using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
-                    {
-                        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                        {
-                            builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
-                        });
+                    //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                    //{
+                    //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                    //    {
+                    //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                    //    });
 
-                        ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                    //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
 
-                        now = DateTime.Now;
-                        using (logger.BeginScope("[scope is enabled]"))
-                        {
-                            logger.LogInformation(now + ": Error Saving to Database");
-                        }
-                    }
+                    //    now = DateTime.Now;
+                    //    using (logger.BeginScope("[scope is enabled]"))
+                    //    {
+                    //        logger.LogInformation(now + ": Error Saving to Database");
+                    //    }
+                    //}
+
+                    Log_Event("Error Saving to Database");
                 }
             }
         }
@@ -843,42 +806,44 @@ namespace PACMAN
                 }
                 catch (System.Data.SqlClient.SqlException ex)
                 {
-                    using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
-                    {
-                        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                        {
-                            builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
-                        });
+                    //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                    //{
+                    //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                    //    {
+                    //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                    //    });
 
-                        ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                    //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
 
-                        DateTime now = DateTime.Now;
-                        using (logger.BeginScope("[scope is enabled]"))
-                        {
-                            logger.LogInformation(now + ": Error Connecting to Database: " + ex.Message);
-                        }
-                    }
+                    //    DateTime now = DateTime.Now;
+                    //    using (logger.BeginScope("[scope is enabled]"))
+                    //    {
+                    //        logger.LogInformation(now + ": Error Connecting to Database: " + ex.Message);
+                    //    }
+                    //}
+
+                    Log_Event("Error Connecting to Database: " + ex.Message);
 
                     MessageBoxResult result = MessageBox.Show("Error Connecting to Database: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 catch (Exception error)
                 {
-                    using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
-                    {
-                        ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                        {
-                            builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
-                        });
+                    //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                    //{
+                    //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                    //    {
+                    //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                    //    });
 
-                        ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                    //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
 
-                        DateTime now = DateTime.Now;
-                        using (logger.BeginScope("[scope is enabled]"))
-                        {
-                            logger.LogInformation(now + ": General Error Occured when updating database: " + error.Message);
-                        }
-                    }
-
+                    //    DateTime now = DateTime.Now;
+                    //    using (logger.BeginScope("[scope is enabled]"))
+                    //    {
+                    //        logger.LogInformation(now + ": General Error Occured when updating database: " + error.Message);
+                    //    }
+                    //}
+                    Log_Event("General Error Occured when updating database: " + error.Message);
                     MessageBoxResult result = MessageBox.Show("General Error Occured when updating database: " + error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
@@ -907,56 +872,61 @@ namespace PACMAN
             //IncrementLoadingBar("Begining Analysis", 10);
 
             List<t_Location> locations = new List<t_Location>();
+            
             try
             {
                 using (var context = new CorrosionModelEntities())
                 {
+                  
                     locations = context.t_Location.ToList();
+                  
                 }
+
             }
             catch (System.Data.SqlClient.SqlException ex)
             {
-                using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
-                {
-                    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                    {
-                        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
-                    });
+                //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                //{
+                //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                //    {
+                //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                //    });
 
-                    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
 
-                    DateTime now = DateTime.Now;
-                    using (logger.BeginScope("[scope is enabled]"))
-                    {
-                        logger.LogInformation(now + ": Error Connecting to Database: " + ex.Message);
-                    }
-                }
-
-                MessageBoxResult result = MessageBox.Show("Error Connecting to Database: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                //    DateTime now = DateTime.Now;
+                //    using (logger.BeginScope("[scope is enabled]"))
+                //    {
+                //        logger.LogInformation(now + ": Error Connecting to Database: " + ex.Message);
+                //    }
+                //}
+                Log_Event("Error Connecting to Database: " + ex.ToString());
+                MessageBoxResult result = MessageBox.Show("Error Connecting to Database: " + ex.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             catch (Exception error)
             {
-                using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
-                {
-                    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
-                    {
-                        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
-                    });
+                //using (StreamWriter logFileWriter = new StreamWriter(errorFilePath, append: true))
+                //{
+                //    ILoggerFactory loggerFactory = LoggerFactory.Create(builder =>
+                //    {
+                //        builder.AddProvider(new CustomFileLoggerProvider(logFileWriter));
+                //    });
 
-                    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
+                //    ILogger<MainWindow> logger = loggerFactory.CreateLogger<MainWindow>();
 
-                    DateTime now = DateTime.Now;
-                    using (logger.BeginScope("[scope is enabled]"))
-                    {
-                        logger.LogInformation(now + ": General Error Occured when connecting to database: " + error.Message);
-                    }
-                }
-
-                MessageBoxResult result = MessageBox.Show("General Error Occured when connecting to database: " + error.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                //    DateTime now = DateTime.Now;
+                //    using (logger.BeginScope("[scope is enabled]"))
+                //    {
+                //        logger.LogInformation(now + ": General Error Occured when connecting to database: " + error.Message);
+                //    }
+                //}
+                Log_Event("General Error Occured when connecting to database: " + error.ToString());
+                MessageBoxResult result = MessageBox.Show("General Error Occured when connecting to database: " + error.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-
             var timespanAnalysisWindow = new TimespanAnalysis(locations);
             timespanAnalysisWindow.ShowDialog();
+            
+            
             if (timespanAnalysisWindow.canceled == false)
             {
                 try
@@ -1123,8 +1093,8 @@ namespace PACMAN
                         if (showMonths)
                         {
                             DateTimeContinuousAxis dateTimeAxis = new DateTimeContinuousAxis();
-                            dateTimeAxis.MajorStep = 1;
-                            dateTimeAxis.MajorStepUnit = Telerik.Charting.TimeInterval.Day;
+                            //dateTimeAxis.MajorStep = 1;
+                            //dateTimeAxis.MajorStepUnit = Telerik.Charting.TimeInterval.Day;
                             dateTimeAxis.LabelFormat = "dd MMM yyyy";
                             dateTimeAxis.LabelFitMode = Telerik.Charting.AxisLabelFitMode.MultiLine;
                             dateTimeAxis.PlotMode = Telerik.Charting.AxisPlotMode.OnTicks;
@@ -1134,8 +1104,8 @@ namespace PACMAN
                         else
                         {
                             DateTimeContinuousAxis dateTimeAxis = new DateTimeContinuousAxis();
-                            dateTimeAxis.MajorStep = 1;
-                            dateTimeAxis.MajorStepUnit = Telerik.Charting.TimeInterval.Day;
+                            /*dateTimeAxis.MajorStep = 1;*/
+                            //dateTimeAxis.MajorStepUnit = Telerik.Charting.TimeInterval.Day;
                             dateTimeAxis.LabelFormat = "dd";
                             dateTimeAxis.PlotMode = Telerik.Charting.AxisPlotMode.OnTicks;
                             TimeOfWetnessChart.HorizontalAxis = dateTimeAxis;

@@ -170,7 +170,11 @@ namespace PACMAN
         public DateTime Date { get; set; }
         public string DateString
         {
-            get { return Date.ToShortDateString(); }
+            get {
+                DateTime universalTime = Date.ToUniversalTime();
+                return universalTime.ToString("MM/dd/yyyy:HH:mm");//"yyyy-MM-dd HH:mm" 
+                //Date.ToUniversalTime().ToString(); 
+            }
         }
         public int Y { get; set; }
         public double Value { get; set; }

@@ -824,27 +824,33 @@ namespace PACMAN
                 }
 
                 combinedData item = sensorData[w];
-                if (item.col8.Day == currentDate.Day && item.col8.Month == currentDate.Month && item.col8.Year == currentDate.Year)
-                {
-                    if (savedMinDate == DateTime.MinValue)
-                    {
-                        savedMinDate = item.col8;
-                    }
-                    temperatureSum = temperatureSum + item.col6;
-                    relativeHumiditySum = relativeHumiditySum + item.col5;
-                    entriesPerDay++;
-                }
-                else
-                {
-                    cd.Temperature.Add(temperatureSum / entriesPerDay);
-                    cd.RelativeHumidity.Add(relativeHumiditySum / entriesPerDay);
-                    cd.Y.Add(currentDate);
+                //this code block takes daily average of temp and rh
+                //if (item.col8.Day == currentDate.Day && item.col8.Month == currentDate.Month && item.col8.Year == currentDate.Year)
+                //{
+                //    if (savedMinDate == DateTime.MinValue)
+                //    {
+                //        savedMinDate = item.col8;
+                //    }
+                //    temperatureSum = temperatureSum + item.col6;
+                //    relativeHumiditySum = relativeHumiditySum + item.col5;
+                //    entriesPerDay++;
+                //}
+                //else
+                //{
+                //    cd.Temperature.Add(temperatureSum / entriesPerDay);
+                //    cd.RelativeHumidity.Add(relativeHumiditySum / entriesPerDay);
+                //    cd.Y.Add(currentDate);
 
-                    currentDate = item.col8;
-                    temperatureSum = item.col6;
-                    relativeHumiditySum = item.col5;
-                    entriesPerDay = 1;
-                }
+                //    currentDate = item.col8;
+                //    temperatureSum = item.col6;
+                //    relativeHumiditySum = item.col5;
+                //    entriesPerDay = 1;
+                //}
+
+                cd.Temperature.Add(item.col6);
+                cd.RelativeHumidity.Add(item.col5);
+                cd.Y.Add(item.col8);
+
                 if (item.col7 != 0)
                 {
                     cd.Precipitation.Add(item.col7);
@@ -1911,6 +1917,7 @@ namespace PACMAN
             steel.Add(0);
             enviro_4.Add(0);
             int steelIndex = 0;
+            int dayIndex = 1;
             foreach (enviroP environs in _enviroP_List[0])
             {
                 try
@@ -1921,7 +1928,9 @@ namespace PACMAN
                         if (environValue != 0)
                         {
                             steel.Add(SteelWL[steelIndex, 1, 1]);
-                            enviro_4.Add(environs.col4);
+                            //enviro_4.Add(environs.col4);
+                            enviro_4.Add(dayIndex);
+                            dayIndex++;
                         }
                         else
                         {
